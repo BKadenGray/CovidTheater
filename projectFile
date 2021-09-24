@@ -1,0 +1,191 @@
+import java.util.Scanner;
+
+class Theater {
+    Scanner in = new Scanner(System.in);
+    double[][] seats;
+    String eventName;
+    int capacity;
+    int caphold = 0;
+    public Theater(int n, int m, String e) {
+        seats = new double[n][m];
+        eventName = e;
+        capacity = (n*m)/2;
+        }
+    public void Price() { //Set pricing of seating
+        double price;
+        for (int r = 0; r < seats.length; r++) {
+            System.out.println("Set the price for Row "+(r+1));
+            price = in.nextDouble();
+            for (int c = 0; c < seats[r].length; c++) {
+                seats[r][c] = price;
+            }
+        }
+    }
+    
+    public void Look(int r, int c) { //Look for seating by row and column
+        if (seats[r-1][c-1] > 0)
+            System.out.println("This seat is avaible!  Reference: R- "+r+" C- "+c);
+        else
+            System.out.println("This seat is unavaible! Reference: R- "+r+" C- "+c);
+    }
+    
+    public void PriceSearch(double price) { //Look for all seats by price
+        int count = 0;
+        for (int r = 0; r < seats.length; r++) {
+            for (int c = 0; c < seats[r].length; c++) {
+                if (seats[r][c] == price) {
+                    System.out.println("Seat in Row "+(r+1)+" and Column "+(c+1)+" is Avaible");
+                    count++;
+                }   
+            }
+            
+        }
+        if (count == 0)
+            System.out.println("There are no seats available for that price.");
+    }
+    
+    public void Buy() { //Buy seating in the Theater
+        int amount; int count = 0;
+        boolean con = false;
+        do {
+        if (caphold == capacity) {
+            System.out.println("We are at fully capacity! Come back another day.");
+            break;
+        }
+        if (caphold < capacity)
+            System.out.println("There are "+(capacity-caphold)+" seats available.");
+        int hold = capacity-caphold;
+        for (int r3 = 0; r3 < seats.length; r3++) {
+            for (int c3 = 0; c3 < seats[r3].length; c3++) {
+                System.out.print(seats[r3][c3]+" ");
+            }
+            System.out.println("");
+        }
+        System.out.println("");
+        System.out.println("Company Policy: 'Only allowing 6 seats to be purchased per party'");
+        System.out.println("");
+        System.out.println("How many seats are you wanting to Reserve?: ");
+        amount = in.nextInt();
+        
+        if (amount > hold) {
+                System.out.println("We do not have the capacity for that many reservations. Please choose again.");
+                amount = in.nextInt();
+        }
+        if (amount > 6) {
+            System.out.println("Company policy allows only up to 6 reservations per party. Please choose again");
+            amount = in.nextInt();
+        }
+        if (amount < 1) {
+            System.out.println("Invalid amount. Please choose again.");
+            amount = in.nextInt();
+        }
+        
+
+        for (int r = 0; r < seats.length; r++) {
+            for (int c = 0; c < seats[r].length; c++) {
+                System.out.print(seats[r][c]+" ");
+            }
+            System.out.println("");
+        }
+        
+        
+        System.out.println("");
+        System.out.println("Please choose your seats. They must be in the same Row, together.");
+        System.out.println("Row Number: ");
+        int row = in.nextInt();
+        System.out.println("Please choose the seat number to start the reservation from.");
+        int cs = in.nextInt();
+        
+        for (int c1 = cs-1; c1 < cs+(amount-1); c1++) {
+            if (c1 > seats[row].length-1)
+                break;
+            if (seats[row][c1] != 0 && seats[row][c1] != -1)
+                count++;
+        }
+        
+        if (count == amount) {
+            for (int c2 = cs-1; c2 < cs+(amount-1); c2++) {
+                if (seats[row][c2] != 0 && seats[row][c2] != -1)
+                    seats[row][c2] = 0;
+            }
+            if (cs-2 >= 0)
+                seats[row][cs-2] = -1;
+            if (cs+amount+1 < seats[row].length)
+                seats[row][cs+amount-1] = -1;
+            
+            caphold+=amount;
+            
+            con = true;
+        }
+        else 
+            System.out.println("There is not enough room in designated area. Please try again.");
+        
+        } while (con == false);
+    }
+    
+    public void Available() {
+        for (int r = 0; r < seats.length; r++) {
+            for (int c = 0; c < seats[r].length; c++) {
+                if (seats[r][c] == 0)
+                    System.out.print("X ");
+                if (seats[r][c] == -1)
+                    System.out.print("U ");
+                if (seats[r][c] > 0)
+                    System.out.print("O ");
+            }
+            System.out.println("");
+        }
+    }
+}
+
+public class BurlGrayHw2 {
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+        int row; int column; String event; int input;
+        
+        System.out.println("Choose the amount of Rows in the Theater.");
+        row = in.nextInt();
+        System.out.println("Choose the amount of Columns in the Theather");
+        column = in.nextInt();
+        System.out.println("What is the name of this Event?");
+        event = in.nextLine();
+        Theater t = new Theater(row, column, event);
+        
+        System.out.println("Welcome to the Theather Menu! (0 Closes the Program)");
+        do {
+            System.out.println("1. Choose Seat Pricing");
+            System.out.println("2. Check if a Seat is avaible.");
+            System.out.println("3. Find all seats avaible by price.");
+            System.out.println("4. Purchase seat reservations.");
+            System.out.println("5. Print current seating reservation avaiblility.");
+            System.out.println("0. Stop the menu.");
+            input = in.nextInt();
+            
+            if (input == 1)
+                t.Price();
+            else if (input == 2) {
+                System.out.println("Enter Row Number: ");
+                int r = in.nextInt();
+                System.out.println("Enter Column Number: ");
+                int c = in.nextInt();
+                t.Look(r, c);
+            }
+            else if (input == 3) {
+                System.out.println("Enter a price: ");
+                double price = in.nextDouble();
+                t.PriceSearch(price);
+            }
+            else if (input == 4) {
+                t.Buy();
+            }
+            else if (input == 5) {
+                t.Available();
+            }
+            else if (input > 5 || input < 0) {
+                System.out.println("Invalid input, try again.");
+                input = in.nextInt();
+            }
+        } while (input != 0);
+    }
+    
+}
